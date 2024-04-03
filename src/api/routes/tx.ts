@@ -32,56 +32,61 @@ import {
   getETagCacheHandler,
   setETagCacheHeaders,
 } from '../controllers/express-cache-controller';
-import { PgStore } from '../../datastore/pg-store';
-import { has0xPrefix, isProdEnv } from '@hirosystems/api-toolkit';
+import { Optional, PaginatedResponse, has0xPrefix, isProdEnv } from '@hirosystems/api-toolkit';
+import { Type, TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
+import { FastifyPluginAsync, FastifyPluginCallback } from 'fastify';
+import db from 'node-pg-migrate/dist/db';
+import { Server } from 'http';
+import { handleChainTipCache } from '../controllers/cache';
+import { LimitParam, OffsetParam, TransactionTypeParam, UnanchoredParam } from '../schemas/params';
+import { TransactionSchema } from '../schemas/entities/transactions';
 
-export function createTxRouter(db: PgStore): express.Router {
-  const router = express.Router();
+const ChainTipRoutes: FastifyPluginCallback<Record<never, never>, Server, TypeBoxTypeProvider> = (
+  fastify,
+  options,
+  done
+) => {
+  fastify.addHook('preHandler', handleChainTipCache);
 
-  const cacheHandler = getETagCacheHandler(db);
-  const mempoolCacheHandler = getETagCacheHandler(db, ETagType.mempool);
-  const txCacheHandler = getETagCacheHandler(db, ETagType.transaction);
-
-  router.get(
+  fastify.get(
     '/',
-    cacheHandler,
-    asyncHandler(async (req, res, next) => {
-      const limit = getPagingQueryLimit(ResourceType.Tx, req.query.limit);
-      const offset = parsePagingQueryInput(req.query.offset ?? 0);
+    {
+      schema: {
+        operationId: 'get_transaction_list',
+        summary: 'Get recent transactions',
+        description: `Retrieves all recently mined transactions
 
-      const typeQuery = req.query.type;
-      let txTypeFilter: TransactionType[];
-      if (Array.isArray(typeQuery)) {
-        txTypeFilter = parseTxTypeStrings(typeQuery as string[]);
-      } else if (typeof typeQuery === 'string') {
-        if (typeQuery.includes(',')) {
-          txTypeFilter = parseTxTypeStrings(typeQuery.split(','));
-        } else {
-          txTypeFilter = parseTxTypeStrings([typeQuery]);
-        }
-      } else if (typeQuery) {
-        throw new Error(`Unexpected tx type query value: ${JSON.stringify(typeQuery)}`);
-      } else {
-        txTypeFilter = [];
-      }
-
-      const includeUnanchored = isUnanchoredRequest(req, res, next);
-      const { results: txResults, total } = await db.getTxList({
+          If using TypeScript, import typings for this response from our types package:
+  
+          \`import type { TransactionResults } from '@stacks/stacks-blockchain-api-types';\``,
+        tags: ['Transactions'],
+        querystring: Type.Object({
+          offset: Optional(OffsetParam),
+          limit: Optional(LimitParam),
+          type: Optional(Type.Array(TransactionTypeParam)),
+          unanchored: Optional(UnanchoredParam),
+        }),
+        response: {
+          200: PaginatedResponse(TransactionSchema, 'List of transactions'),
+        },
+      },
+    },
+    async (req, res) => {
+      const limit = req.query.limit ?? getPagingQueryLimit(ResourceType.Tx, req.query.limit);
+      const offset = req.query.offset ?? 0;
+      const { results: txResults, total } = await fastify.db.getTxList({
         offset,
         limit,
-        txTypeFilter,
-        includeUnanchored,
+        txTypeFilter: req.query.type ?? [],
+        includeUnanchored: req.query.unanchored ?? false,
       });
-      const results = txResults.map(tx => parseDbTx(tx));
-      const response: TransactionResults = { limit, offset, total, results };
-      if (!isProdEnv) {
-        const schemaPath =
-          '@stacks/stacks-blockchain-api-types/api/transaction/get-transactions.schema.json';
-        await validate(schemaPath, response);
-      }
-      setETagCacheHeaders(res);
-      res.json(response);
-    })
+      await res.send({
+        limit,
+        offset,
+        total,
+        results: txResults.map(tx => parseDbTx(tx)),
+      });
+    }
   );
 
   router.get(
@@ -373,4 +378,12 @@ export function createTxRouter(db: PgStore): express.Router {
   );
 
   return router;
-}
+};
+
+export const V1TxRoutes: FastifyPluginAsync<
+  Record<never, never>,
+  Server,
+  TypeBoxTypeProvider
+> = async fastify => {
+  await fastify.register(ChainTipRoutes);
+};

@@ -1,4 +1,7 @@
-import { Type } from '@sinclair/typebox';
+import { Static, Type } from '@sinclair/typebox';
+
+export const PostConditionModeSchema = Type.Union([Type.Literal('allow'), Type.Literal('deny')]);
+export type PostConditionMode = Static<typeof PostConditionModeSchema>;
 
 const PostConditionPrincipalSchema = Type.Union([
   Type.Object({
@@ -14,6 +17,7 @@ const PostConditionPrincipalSchema = Type.Union([
     contract_name: Type.String(),
   }),
 ]);
+export type PostConditionPrincipal = Static<typeof PostConditionPrincipalSchema>;
 
 const PostConditionFungibleConditionCodeSchema = Type.Union([
   Type.Literal('sent_equal_to'),
@@ -23,49 +27,43 @@ const PostConditionFungibleConditionCodeSchema = Type.Union([
   Type.Literal('sent_less_than_or_equal_to'),
 ]);
 
-const PostConditionStxSchema = Type.Composite([
-  PostConditionPrincipalSchema,
-  Type.Object({
-    condition_code: PostConditionFungibleConditionCodeSchema,
-    amount: Type.String(),
-    type: Type.Literal('stx'),
-  }),
-]);
+const PostConditionStxSchema = Type.Object({
+  principal: PostConditionPrincipalSchema,
+  condition_code: PostConditionFungibleConditionCodeSchema,
+  amount: Type.String(),
+  type: Type.Literal('stx'),
+});
 
-const PostConditionFungibleSchema = Type.Composite([
-  PostConditionPrincipalSchema,
-  Type.Object({
-    condition_code: PostConditionFungibleConditionCodeSchema,
-    amount: Type.String(),
-    type: Type.Literal('fungible'),
-    asset: Type.Object({
-      asset_name: Type.String(),
-      contract_address: Type.String(),
-      contract_name: Type.String(),
-    }),
+const PostConditionFungibleAssetSchema = Type.Object({
+  principal: PostConditionPrincipalSchema,
+  condition_code: PostConditionFungibleConditionCodeSchema,
+  amount: Type.String(),
+  type: Type.Literal('fungible'),
+  asset: Type.Object({
+    asset_name: Type.String(),
+    contract_address: Type.String(),
+    contract_name: Type.String(),
   }),
-]);
+});
 
-const PostConditionNonFungibleSchema = Type.Composite([
-  PostConditionPrincipalSchema,
-  Type.Object({
-    condition_code: Type.Union([Type.Literal('sent'), Type.Literal('not_sent')]),
-    amount: Type.String(),
-    type: Type.Literal('non_fungible'),
-    asset_value: Type.Object({
-      hex: Type.String(),
-      repr: Type.String(),
-    }),
-    asset: Type.Object({
-      asset_name: Type.String(),
-      contract_address: Type.String(),
-      contract_name: Type.String(),
-    }),
+const PostConditionNonFungibleAssetSchema = Type.Object({
+  principal: PostConditionPrincipalSchema,
+  condition_code: Type.Union([Type.Literal('sent'), Type.Literal('not_sent')]),
+  type: Type.Literal('non_fungible'),
+  asset_value: Type.Object({
+    hex: Type.String(),
+    repr: Type.String(),
   }),
-]);
+  asset: Type.Object({
+    asset_name: Type.String(),
+    contract_address: Type.String(),
+    contract_name: Type.String(),
+  }),
+});
 
 export const PostConditionSchema = Type.Union([
   PostConditionStxSchema,
-  PostConditionFungibleSchema,
-  PostConditionNonFungibleSchema,
+  PostConditionFungibleAssetSchema,
+  PostConditionNonFungibleAssetSchema,
 ]);
+export type PostCondition = Static<typeof PostConditionSchema>;

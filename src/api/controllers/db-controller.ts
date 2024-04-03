@@ -12,23 +12,12 @@ import {
 } from 'stacks-encoding-native-js';
 
 import {
-  AbstractMempoolTransaction,
-  AbstractTransaction,
-  BaseTransaction,
   Block,
-  CoinbaseTransactionMetadata,
-  ContractCallTransactionMetadata,
-  MempoolTransaction,
   MempoolTransactionStatus,
   Microblock,
-  PoisonMicroblockTransactionMetadata,
   RosettaBlock,
   RosettaParentBlockIdentifier,
   RosettaTransaction,
-  SmartContractTransactionMetadata,
-  TenureChangeTransactionMetadata,
-  TokenTransferTransactionMetadata,
-  Transaction,
   TransactionAnchorModeType,
   TransactionEvent,
   TransactionEventFungibleAsset,
@@ -38,7 +27,6 @@ import {
   TransactionEventStxLock,
   TransactionFound,
   TransactionList,
-  TransactionMetadata,
   TransactionNotFound,
   TransactionStatus,
   TransactionType,
@@ -67,6 +55,22 @@ import { getOperations, parseTransactionMemo } from '../../rosetta/rosetta-helpe
 import { PgStore } from '../../datastore/pg-store';
 import { SyntheticPoxEventName } from '../../pox-helpers';
 import { logger } from '../../logger';
+import {
+  AbstractTransaction,
+  BaseTransaction,
+  CoinbaseTransactionMetadata,
+  ContractCallTransactionMetadata,
+  PoisonMicroblockTransactionMetadata,
+  SmartContractTransactionMetadata,
+  TenureChangeTransactionMetadata,
+  TokenTransferTransactionMetadata,
+  Transaction,
+  TransactionMetadata,
+} from '../schemas/entities/transactions';
+import {
+  AbstractMempoolTransaction,
+  MempoolTransaction,
+} from '../schemas/entities/mempool-transactions';
 
 export function parseTxTypeStrings(values: string[]): TransactionType[] {
   return values.map(v => {

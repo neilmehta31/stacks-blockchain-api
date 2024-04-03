@@ -178,65 +178,6 @@ paths:
         500:
           description: Faucet call failed
 
-  /extended/v1/tx:
-    get:
-      summary: Get recent transactions
-      tags:
-        - Transactions
-      operationId: get_transaction_list
-      description: |
-        Retrieves all recently mined transactions
-
-        If using TypeScript, import typings for this response from our types package:
-
-        `import type { TransactionResults } from '@stacks/stacks-blockchain-api-types';`
-      parameters:
-        - name: limit
-          in: query
-          description: max number of transactions to fetch
-          required: false
-          schema:
-            type: integer
-            default: 96
-            maximum: 200
-            example: 100
-        - name: offset
-          in: query
-          description: index of first transaction to fetch
-          required: false
-          schema:
-            type: integer
-            example: 42000
-        - name: type
-          in: query
-          description: Filter by transaction type
-          required: false
-          style: form
-          explode: true
-          schema:
-            type: array
-            example: coinbase
-            items:
-              type: string
-              enum: [coinbase, token_transfer, smart_contract, contract_call, poison_microblock, tenure_change]
-        - name: unanchored
-          in: query
-          description: Include transaction data from unanchored (i.e. unconfirmed) microblocks
-          required: false
-          schema:
-            type: boolean
-            example: true
-            default: false
-      responses:
-        200:
-          description: List of transactions
-          content:
-            application/json:
-              schema:
-                $ref: ./api/transaction/get-transactions.schema.json
-              example:
-                $ref: ./api/transaction/get-transactions.example.json
-
   /extended/v1/tx/mempool:
     get:
       summary: Get mempool transactions

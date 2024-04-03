@@ -1,15 +1,14 @@
 import {
-  PostCondition,
-  PostConditionPrincipal as PostConditionPrincipalDocsType,
-  PostConditionMode,
-} from '@stacks/stacks-blockchain-api-types';
-
-import {
   TxPostCondition,
   PostConditionAssetInfoID,
   PostConditionPrincipal,
   PostConditionPrincipalTypeID,
 } from 'stacks-encoding-native-js';
+import {
+  PostCondition,
+  PostConditionMode,
+  PostConditionPrincipal as PostConditionPrincipalDocsType,
+} from '../schemas/entities/post-conditions';
 
 const assetPrincipalTypeMap = {
   [PostConditionPrincipalTypeID.Origin]: 'principal_origin',

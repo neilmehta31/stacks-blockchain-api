@@ -2,7 +2,7 @@ import { SERVER_VERSION, logger } from '@hirosystems/api-toolkit';
 import { FastifyPluginCallback, FastifyReply, FastifyRequest } from 'fastify';
 import { Server } from 'http';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
-import { ServerStatusResponse, ServerStatusResponseSchema } from '../schemas';
+import { ServerStatusResponse, ServerStatusResponseSchema } from '../schemas/responses';
 import { handleChainTipCache } from '../controllers/cache';
 
 export const StatusRoutes: FastifyPluginCallback<
@@ -33,9 +33,9 @@ export const StatusRoutes: FastifyPluginCallback<
     try {
       const poxForceUnlockHeights = await fastify.db.getPoxForceUnlockHeights();
       if (poxForceUnlockHeights.found) {
-        response.pox_v1_unlock_height = poxForceUnlockHeights.result.pox1UnlockHeight as number;
-        response.pox_v2_unlock_height = poxForceUnlockHeights.result.pox2UnlockHeight as number;
-        response.pox_v3_unlock_height = poxForceUnlockHeights.result.pox3UnlockHeight as number;
+        response.pox_v1_unlock_height = poxForceUnlockHeights.result.pox1UnlockHeight;
+        response.pox_v2_unlock_height = poxForceUnlockHeights.result.pox2UnlockHeight;
+        response.pox_v3_unlock_height = poxForceUnlockHeights.result.pox3UnlockHeight;
       }
       const chainTip = await fastify.db.getChainTip(fastify.db.sql);
       if (chainTip.block_height > 0) {

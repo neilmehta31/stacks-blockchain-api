@@ -9,13 +9,17 @@ import { PINO_LOGGER_CONFIG, SERVER_VERSION, isProdEnv } from '@hirosystems/api-
 import { Server } from 'http';
 import { StatusRoutes } from './routes/status';
 import { DocsRoutes } from './routes/docs';
+import { V1TxRoutes } from './routes/tx';
 
 export const ApiV1: FastifyPluginAsync<
   Record<never, never>,
   Server,
   TypeBoxTypeProvider
 > = async fastify => {
-  // await fastify.register(StatusRoutes);
+  fastify.get('/status', async (_, reply) => {
+    await reply.redirect(301, '/extended');
+  });
+  await fastify.register(V1TxRoutes);
 };
 
 export const Api: FastifyPluginAsync<
@@ -23,11 +27,16 @@ export const Api: FastifyPluginAsync<
   Server,
   TypeBoxTypeProvider
 > = async fastify => {
-  fastify.addHook('preHandler', async (request, reply) => {
+  // Set API version in all responses.
+  fastify.addHook('preHandler', async (_, reply) => {
     void reply.header(
       'X-API-Version',
       `${SERVER_VERSION.tag} (${SERVER_VERSION.branch}:${SERVER_VERSION.commit})`
     );
+  });
+  // Set caching on all routes to be disabled by default, individual routes can override.
+  fastify.addHook('preHandler', async (_, reply) => {
+    void reply.header('Cache-Control', 'no-store');
   });
 
   await fastify.register(DocsRoutes);

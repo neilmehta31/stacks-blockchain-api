@@ -12,7 +12,15 @@
     "tenure_change_payload": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["tenure_consensus_hash", "prev_tenure_consensus_hash", "burn_view_consensus_hash", "previous_tenure_end", "previous_tenure_blocks", "cause", "pubkey_hash"],
+      "required": [
+        "tenure_consensus_hash",
+        "prev_tenure_consensus_hash",
+        "burn_view_consensus_hash",
+        "previous_tenure_end",
+        "previous_tenure_blocks",
+        "cause",
+        "pubkey_hash"
+      ],
       "properties": {
         "tenure_consensus_hash": {
           "type": "string",
