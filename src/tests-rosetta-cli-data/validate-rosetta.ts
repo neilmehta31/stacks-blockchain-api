@@ -1,4 +1,4 @@
-import { ApiServer, startApiServer } from '../api/init';
+import { ApiServer, startApiServer } from '../api/init-old';
 import {
   makeSTXTokenTransfer,
   makeContractDeploy,

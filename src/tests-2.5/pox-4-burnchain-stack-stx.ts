@@ -24,7 +24,7 @@ import {
 import * as btc from 'bitcoinjs-lib';
 import { b58ToC32, c32ToB58 } from 'c32check';
 import { PgWriteStore } from '../datastore/pg-write-store';
-import { ApiServer } from '../api/init';
+import { ApiServer } from '../api/init-old';
 import { StacksNetwork } from '@stacks/network';
 import { RPCClient } from 'rpc-bitcoin';
 import * as supertest from 'supertest';

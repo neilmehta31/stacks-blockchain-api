@@ -1,5 +1,5 @@
 import * as WebSocket from 'ws';
-import { startApiServer, ApiServer } from '../api/init';
+import { startApiServer, ApiServer } from '../api/init-old';
 import { DbTxTypeId, DbTxStatus, DbAssetEventTypeId } from '../datastore/common';
 import { once } from 'events';
 import { RpcWebSocketClient } from 'rpc-websocket-client';

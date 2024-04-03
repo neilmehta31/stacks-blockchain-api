@@ -1,7 +1,7 @@
 import * as supertest from 'supertest';
 import { PgSqlClient } from '@hirosystems/api-toolkit';
 import { ChainID } from '@stacks/common';
-import { ApiServer, startApiServer } from '../api/init';
+import { ApiServer, startApiServer } from '../api/init-old';
 import { PgWriteStore } from '../datastore/pg-write-store';
 import { importEventsFromTsv } from '../event-replay/event-replay';
 import { migrate } from '../test-utils/test-helpers';

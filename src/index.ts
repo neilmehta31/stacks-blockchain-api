@@ -4,7 +4,7 @@ import {
   chainIdConfigurationCheck,
 } from './helpers';
 import * as sourceMapSupport from 'source-map-support';
-import { startApiServer } from './api/init2';
+import { buildApiServer } from './api/init';
 import { startProfilerServer } from './inspector-util';
 import { startEventServer } from './event-stream/event-server';
 import { StacksCoreRpcClient } from './core-rpc/client';
@@ -19,13 +19,7 @@ import { PgStore } from './datastore/pg-store';
 import { PgWriteStore } from './datastore/pg-write-store';
 import { registerMempoolPromStats } from './datastore/helpers';
 import { logger } from './logger';
-import {
-  isProdEnv,
-  numberToHex,
-  parseBoolean,
-  registerShutdownConfig,
-  timeout,
-} from '@hirosystems/api-toolkit';
+import { isProdEnv, numberToHex, registerShutdownConfig, timeout } from '@hirosystems/api-toolkit';
 import { ENV } from './env';
 
 // ts-node has automatic source map support, avoid clobbering
@@ -115,7 +109,7 @@ async function init(): Promise<void> {
 
   if (['default', 'readonly', 'offline'].includes(apiMode)) {
     logger.info(`Initializing API server...`);
-    const apiServer = await startApiServer({
+    const apiServer = await buildApiServer({
       datastore: dbStore,
       writeDatastore: dbWriteStore,
       chainId: getApiConfiguredChainID(),

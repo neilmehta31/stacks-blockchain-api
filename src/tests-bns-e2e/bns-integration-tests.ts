@@ -1,4 +1,4 @@
-import { ApiServer, startApiServer } from '../api/init';
+import { ApiServer, startApiServer } from '../api/init-old';
 import * as supertest from 'supertest';
 import { createHash } from 'crypto';
 import { AnchorMode, ChainID, PostConditionMode, someCV } from '@stacks/transactions';

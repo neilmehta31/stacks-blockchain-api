@@ -18,7 +18,7 @@ import {
   DbSmartContractEvent,
   DbSmartContract,
 } from '../datastore/common';
-import { startApiServer } from '../api/init';
+import { startApiServer } from '../api/init-old';
 import { httpPostRequest, I32_MAX } from '../helpers';
 import {
   AddressStxBalanceResponse,

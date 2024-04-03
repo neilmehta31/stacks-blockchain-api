@@ -9,7 +9,7 @@ import {
   DbAssetEventTypeId,
   DbMinerReward,
 } from '../datastore/common';
-import { startApiServer, ApiServer } from '../api/init';
+import { startApiServer, ApiServer } from '../api/init-old';
 import { I32_MAX, microStxToStx, STACKS_DECIMAL_PLACES } from '../helpers';
 import { FEE_RATE } from '../api/routes/fee-rate';
 import { FeeRateRequest } from 'docs/generated';

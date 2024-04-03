@@ -1,6 +1,6 @@
 import * as supertest from 'supertest';
 import { ChainID, cvToHex, stringUtf8CV, uintCV } from '@stacks/transactions';
-import { ApiServer, startApiServer } from '../api/init';
+import { ApiServer, startApiServer } from '../api/init-old';
 import { TestBlockBuilder } from '../test-utils/test-builders';
 import { DbAssetEventTypeId } from '../datastore/common';
 import { PgWriteStore } from '../datastore/pg-write-store';

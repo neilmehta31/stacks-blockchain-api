@@ -36,7 +36,7 @@ import {
   DbTxAnchorMode,
   DbStxEvent,
 } from '../datastore/common';
-import { startApiServer, ApiServer } from '../api/init';
+import { startApiServer, ApiServer } from '../api/init-old';
 import { I32_MAX } from '../helpers';
 import { TestBlockBuilder } from '../test-utils/test-builders';
 import { PgWriteStore } from '../datastore/pg-write-store';

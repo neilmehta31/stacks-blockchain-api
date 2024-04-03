@@ -30,7 +30,7 @@ import {
   DbMempoolTxRaw,
   DbTx,
 } from '../datastore/common';
-import { startApiServer, ApiServer } from '../api/init';
+import { startApiServer, ApiServer } from '../api/init-old';
 import { I32_MAX } from '../helpers';
 import {
   TestBlockBuilder,

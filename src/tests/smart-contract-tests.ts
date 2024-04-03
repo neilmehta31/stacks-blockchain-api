@@ -8,7 +8,7 @@ import {
   DbSmartContract,
   DbSmartContractEvent,
 } from '../datastore/common';
-import { startApiServer, ApiServer } from '../api/init';
+import { startApiServer, ApiServer } from '../api/init-old';
 import { I32_MAX } from '../helpers';
 import { PgWriteStore } from '../datastore/pg-write-store';
 import { bufferToHex, PgSqlClient, waiter } from '@hirosystems/api-toolkit';

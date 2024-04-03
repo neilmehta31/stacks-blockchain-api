@@ -1,6 +1,6 @@
 import * as supertest from 'supertest';
 import { ChainID } from '@stacks/transactions';
-import { startApiServer } from '../api/init';
+import { startApiServer } from '../api/init-old';
 import { useWithCleanup, withEnvVars } from './test-helpers';
 import * as fs from 'fs';
 import * as path from 'path';

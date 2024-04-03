@@ -1,4 +1,4 @@
-import { ApiServer, startApiServer } from '../api/init';
+import { ApiServer, startApiServer } from '../api/init-old';
 import * as supertest from 'supertest';
 import { ChainID } from '@stacks/transactions';
 import { importV1BnsNames, importV1BnsSubdomains } from '../import-v1';

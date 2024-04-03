@@ -1,7 +1,7 @@
 import { StacksTestnet } from '@stacks/network';
 import { ChainID } from '@stacks/transactions';
 import { RPCClient } from 'rpc-bitcoin';
-import { startApiServer } from '../api/init';
+import { startApiServer } from '../api/init-old';
 import { StacksCoreRpcClient } from '../core-rpc/client';
 import { PgWriteStore } from '../datastore/pg-write-store';
 import { loadDotEnv } from '../helpers';

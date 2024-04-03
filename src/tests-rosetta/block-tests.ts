@@ -1,6 +1,6 @@
 import * as supertest from 'supertest';
 import { bufferCV, ChainID, cvToHex, listCV, stringAsciiCV, stringUtf8CV, tupleCV, uintCV } from '@stacks/transactions';
-import { ApiServer, startApiServer } from '../api/init';
+import { ApiServer, startApiServer } from '../api/init-old';
 import { TestBlockBuilder } from '../test-utils/test-builders';
 import { DbAssetEventTypeId, DbTxTypeId } from '../datastore/common';
 import { createClarityValueArray } from '../stacks-encoding-helpers';

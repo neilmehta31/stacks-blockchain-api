@@ -13,7 +13,7 @@ import {
   DbSmartContract,
   DataStoreBlockUpdateData,
 } from '../datastore/common';
-import { startApiServer, ApiServer } from '../api/init';
+import { startApiServer, ApiServer } from '../api/init-old';
 import { I32_MAX } from '../helpers';
 import { PgWriteStore } from '../datastore/pg-write-store';
 import { PgSqlClient, bufferToHex } from '@hirosystems/api-toolkit';

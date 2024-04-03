@@ -1,6 +1,6 @@
 import { io } from 'socket.io-client';
 import { ChainID } from '@stacks/common';
-import { ApiServer, startApiServer } from '../api/init';
+import { ApiServer, startApiServer } from '../api/init-old';
 import { DbAssetEventTypeId, DbTxStatus } from '../datastore/common';
 import {
   Block,

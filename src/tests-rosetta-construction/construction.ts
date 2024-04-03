@@ -43,7 +43,7 @@ import {
 } from '@stacks/transactions';
 import * as assert from 'assert';
 import * as supertest from 'supertest';
-import { ApiServer, startApiServer } from '../api/init';
+import { ApiServer, startApiServer } from '../api/init-old';
 import {
   RosettaConstants,
   RosettaErrors,

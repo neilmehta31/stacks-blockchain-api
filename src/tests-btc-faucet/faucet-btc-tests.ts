@@ -8,7 +8,7 @@ import {
   getKeyAddress,
   getBtcBalance,
 } from '../btc-faucet';
-import { ApiServer, startApiServer } from '../api/init';
+import { ApiServer, startApiServer } from '../api/init-old';
 import { ChainID } from '@stacks/transactions';
 import { PgStore } from '../datastore/pg-store';
 import { PgWriteStore } from '../datastore/pg-write-store';

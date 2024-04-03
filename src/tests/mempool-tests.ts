@@ -1,6 +1,6 @@
 import * as supertest from 'supertest';
 import { ChainID } from '@stacks/transactions';
-import { startApiServer, ApiServer } from '../api/init';
+import { startApiServer, ApiServer } from '../api/init-old';
 import { PgWriteStore } from '../datastore/pg-write-store';
 import {
   DbBlock,

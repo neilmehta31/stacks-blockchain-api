@@ -3,7 +3,7 @@ import { PgStore } from '../../../datastore/pg-store';
 import {
   getETagCacheHandler,
   setETagCacheHeaders,
-} from '../../../api/controllers/cache-controller';
+} from '../../controllers/cache-controller';
 import { asyncHandler } from '../../async-handler';
 import { NakamotoBlockListResponse, TransactionResults } from 'docs/generated';
 import {

@@ -1,25 +1,43 @@
-import * as express from 'express';
-import { ServerStatusResponse } from '@stacks/stacks-blockchain-api-types';
-import { getETagCacheHandler, setETagCacheHeaders } from '../controllers/cache-controller';
-import { PgStore } from '../../datastore/pg-store';
-import { SERVER_VERSION } from '@hirosystems/api-toolkit';
+import { SERVER_VERSION, logger } from '@hirosystems/api-toolkit';
+import { FastifyPluginCallback, FastifyReply, FastifyRequest } from 'fastify';
+import { Server } from 'http';
+import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
+import { ServerStatusResponse, ServerStatusResponseSchema } from '../schemas';
 
-export function createStatusRouter(db: PgStore): express.Router {
-  const router = express.Router();
-  const cacheHandler = getETagCacheHandler(db);
-  const statusHandler = async (_: Request, res: any) => {
+export const StatusRoutes: FastifyPluginCallback<
+  Record<never, never>,
+  Server,
+  TypeBoxTypeProvider
+> = (fastify, options, done) => {
+  // const cacheHandler = getETagCacheHandler(db);
+  const schema = {
+    schema: {
+      operationId: 'get_status',
+      summary: 'API status',
+      description:
+        'Retrieves the running status of the Stacks Blockchain API, including the server version and current chain tip information.',
+      tags: ['Info'],
+      response: {
+        200: ServerStatusResponseSchema,
+      },
+    },
+  };
+  const handler = async (request: FastifyRequest, reply: FastifyReply) => {
+    const response: ServerStatusResponse = {
+      server_version: `stacks-blockchain-api ${SERVER_VERSION.tag} (${SERVER_VERSION.branch}:${SERVER_VERSION.commit})`,
+      status: 'ready',
+      pox_v1_unlock_height: null,
+      pox_v2_unlock_height: null,
+      pox_v3_unlock_height: null,
+    };
     try {
-      const response: ServerStatusResponse = {
-        server_version: `stacks-blockchain-api ${SERVER_VERSION.tag} (${SERVER_VERSION.branch}:${SERVER_VERSION.commit})`,
-        status: 'ready',
-      };
-      const poxForceUnlockHeights = await db.getPoxForceUnlockHeights();
+      const poxForceUnlockHeights = await fastify.db.getPoxForceUnlockHeights();
       if (poxForceUnlockHeights.found) {
         response.pox_v1_unlock_height = poxForceUnlockHeights.result.pox1UnlockHeight as number;
         response.pox_v2_unlock_height = poxForceUnlockHeights.result.pox2UnlockHeight as number;
         response.pox_v3_unlock_height = poxForceUnlockHeights.result.pox3UnlockHeight as number;
       }
-      const chainTip = await db.getChainTip(db.sql);
+      const chainTip = await fastify.db.getChainTip(fastify.db.sql);
       if (chainTip.block_height > 0) {
         response.chain_tip = {
           block_height: chainTip.block_height,
@@ -30,17 +48,15 @@ export function createStatusRouter(db: PgStore): express.Router {
           burn_block_height: chainTip.burn_block_height,
         };
       }
-      setETagCacheHeaders(res);
-      res.json(response);
     } catch (error) {
-      const response: ServerStatusResponse = {
-        status: 'ready',
-      };
-      res.json(response);
+      logger.warn(error, `Unable to retrieve status chain tip`);
     }
+    // setETagCacheHeaders(res);
+    await reply.send(response);
   };
-  router.get('/', cacheHandler, statusHandler);
-  router.post('/', cacheHandler, statusHandler);
 
-  return router;
-}
+  fastify.addHook('preHandler', handleInscriptionTransfersCache);
+  fastify.get('/', schema, handler);
+  fastify.post('/', schema, handler);
+  done();
+};

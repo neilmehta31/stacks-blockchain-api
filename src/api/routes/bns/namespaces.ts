@@ -8,7 +8,7 @@ import { BnsGetAllNamespacesResponse } from '@stacks/stacks-blockchain-api-types
 import {
   getETagCacheHandler,
   setETagCacheHeaders,
-} from '../../../api/controllers/cache-controller';
+} from '../../controllers/cache-controller';
 
 export function createBnsNamespacesRouter(db: PgStore): express.Router {
   const router = express.Router();

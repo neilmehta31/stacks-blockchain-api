@@ -1,4 +1,4 @@
-import { ApiServer, startApiServer } from '../api/init';
+import { ApiServer, startApiServer } from '../api/init-old';
 import * as supertest from 'supertest';
 import { validate } from '../api/rosetta-validate';
 import { DbAssetEventTypeId, DbBlock, DbBnsName, DbBnsNamespace, DbBnsSubdomain } from '../datastore/common';

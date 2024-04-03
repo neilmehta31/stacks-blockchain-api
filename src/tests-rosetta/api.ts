@@ -1,4 +1,4 @@
-import { ApiServer, startApiServer } from '../api/init';
+import { ApiServer, startApiServer } from '../api/init-old';
 import * as supertest from 'supertest';
 import { DbMempoolTxRaw, DbTxStatus, DbTxTypeId, DbTxAnchorMode } from '../datastore/common';
 import * as assert from 'assert';

@@ -43,7 +43,7 @@ import {
   decodeClarityValue,
 } from 'stacks-encoding-native-js';
 import * as supertest from 'supertest';
-import { ApiServer } from '../api/init';
+import { ApiServer } from '../api/init-old';
 import { testnetKeys } from '../api/routes/debug';
 import { CoreRpcPoxInfo, StacksCoreRpcClient } from '../core-rpc/client';
 import { DbBlock, DbTx, DbTxStatus } from '../datastore/common';

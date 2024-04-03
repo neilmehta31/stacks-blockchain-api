@@ -1,7 +1,7 @@
 import * as supertest from 'supertest';
 import { ChainID } from '@stacks/transactions';
 import { DbBurnchainReward, DbRewardSlotHolder } from '../datastore/common';
-import { startApiServer, ApiServer } from '../api/init';
+import { startApiServer, ApiServer } from '../api/init-old';
 import { PgWriteStore } from '../datastore/pg-write-store';
 import { PgSqlClient } from '@hirosystems/api-toolkit';
 import { migrate } from '../test-utils/test-helpers';
