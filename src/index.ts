@@ -1,11 +1,10 @@
 import {
-  loadDotEnv,
   getApiConfiguredChainID,
   getStacksNodeChainID,
   chainIdConfigurationCheck,
 } from './helpers';
 import * as sourceMapSupport from 'source-map-support';
-import { startApiServer } from './api/init';
+import { startApiServer } from './api/init2';
 import { startProfilerServer } from './inspector-util';
 import { startEventServer } from './event-stream/event-server';
 import { StacksCoreRpcClient } from './core-rpc/client';
@@ -27,53 +26,7 @@ import {
   registerShutdownConfig,
   timeout,
 } from '@hirosystems/api-toolkit';
-
-enum StacksApiMode {
-  /**
-   * Default mode. Runs both the Event Server and API endpoints. AKA read-write mode.
-   */
-  default = 'default',
-  /**
-   * Runs the API endpoints without an Event Server. A connection to a `default`
-   * or `writeOnly` API's postgres DB is required.
-   */
-  readOnly = 'readonly',
-  /**
-   * Runs the Event Server only.
-   */
-  writeOnly = 'writeonly',
-  /**
-   * Runs without an Event Server or API endpoints. Used for Rosetta only.
-   */
-  offline = 'offline',
-}
-
-/**
- * Determines the current API execution mode based on .env values.
- * @returns detected StacksApiMode
- */
-function getApiMode(): StacksApiMode {
-  switch (process.env['STACKS_API_MODE']) {
-    case 'readonly':
-      return StacksApiMode.readOnly;
-    case 'writeonly':
-      return StacksApiMode.writeOnly;
-    case 'offline':
-      return StacksApiMode.offline;
-    default:
-      break;
-  }
-  // Make sure we're backwards compatible if `STACKS_API_MODE` is not specified.
-  if (parseBoolean(process.env['STACKS_READ_ONLY_MODE'])) {
-    return StacksApiMode.readOnly;
-  }
-  if (parseBoolean(process.env['STACKS_API_OFFLINE_MODE'])) {
-    return StacksApiMode.offline;
-  }
-  return StacksApiMode.default;
-}
-
-loadDotEnv();
+import { ENV } from './env';
 
 // ts-node has automatic source map support, avoid clobbering
 if (!process.execArgv.some(r => r.includes('ts-node'))) {
@@ -114,10 +67,10 @@ async function init(): Promise<void> {
     );
   }
   chainIdConfigurationCheck();
-  const apiMode = getApiMode();
+  const apiMode = ENV.STACKS_API_MODE;
   let dbStore: PgStore;
   let dbWriteStore: PgWriteStore;
-  if (apiMode === StacksApiMode.offline) {
+  if (apiMode === 'offline') {
     dbStore = OfflineDummyStore;
     dbWriteStore = OfflineDummyStore;
   } else {
@@ -126,12 +79,12 @@ async function init(): Promise<void> {
     });
     dbWriteStore = await PgWriteStore.connect({
       usageName: `write-datastore-${apiMode}`,
-      skipMigrations: apiMode === StacksApiMode.readOnly,
+      skipMigrations: apiMode === 'readonly',
     });
     registerMempoolPromStats(dbWriteStore.eventEmitter);
   }
 
-  if (apiMode === StacksApiMode.default || apiMode === StacksApiMode.writeOnly) {
+  if (apiMode === 'default' || apiMode === 'writeonly') {
     const configuredChainID = getApiConfiguredChainID();
     const eventServer = await startEventServer({
       datastore: dbWriteStore,
@@ -143,8 +96,7 @@ async function init(): Promise<void> {
       forceKillable: false,
     });
 
-    const skipChainIdCheck = parseBoolean(process.env['SKIP_STACKS_CHAIN_ID_CHECK']);
-    if (!skipChainIdCheck) {
+    if (!ENV.SKIP_STACKS_CHAIN_ID_CHECK) {
       const networkChainId = await getStacksNodeChainID();
       if (networkChainId !== configuredChainID) {
         const chainIdConfig = numberToHex(configuredChainID);
@@ -161,26 +113,27 @@ async function init(): Promise<void> {
     });
   }
 
-  if (
-    apiMode === StacksApiMode.default ||
-    apiMode === StacksApiMode.readOnly ||
-    apiMode === StacksApiMode.offline
-  ) {
+  if (['default', 'readonly', 'offline'].includes(apiMode)) {
+    logger.info(`Initializing API server...`);
     const apiServer = await startApiServer({
       datastore: dbStore,
       writeDatastore: dbWriteStore,
       chainId: getApiConfiguredChainID(),
     });
-    logger.info(`API server listening on: http://${apiServer.address}`);
     registerShutdownConfig({
       name: 'API Server',
-      handler: () => apiServer.terminate(),
-      forceKillable: true,
-      forceKillHandler: () => apiServer.forceKill(),
+      handler: async () => {
+        await apiServer.close();
+      },
+      forceKillable: false,
+    });
+    await apiServer.listen({
+      host: ENV.STACKS_BLOCKCHAIN_API_HOST,
+      port: ENV.STACKS_BLOCKCHAIN_API_PORT,
     });
   }
 
-  const profilerHttpServerPort = process.env['STACKS_PROFILER_PORT'];
+  const profilerHttpServerPort = ENV.STACKS_PROFILER_PORT;
   if (profilerHttpServerPort) {
     const profilerServer = await startProfilerServer(profilerHttpServerPort);
     registerShutdownConfig({
@@ -190,7 +143,7 @@ async function init(): Promise<void> {
     });
   }
 
-  if (apiMode !== StacksApiMode.offline) {
+  if (apiMode !== 'offline') {
     registerShutdownConfig({
       name: 'DB',
       handler: async () => {
