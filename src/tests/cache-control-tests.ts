@@ -4,7 +4,7 @@ import { getBlockFromDataStore } from '../api/controllers/db-controller';
 import { DbBlock, DbMicroblockPartial, DbTxRaw, DbTxStatus, DbTxTypeId } from '../datastore/common';
 import { startApiServer, ApiServer } from '../api/init-old';
 import { I32_MAX } from '../helpers';
-import { parseIfNoneMatchHeader } from '../api/controllers/cache-controller';
+import { parseIfNoneMatchHeader } from '../api/controllers/express-cache-controller';
 import { TestBlockBuilder, testMempoolTx } from '../test-utils/test-builders';
 import { PgWriteStore } from '../datastore/pg-write-store';
 import { PgSqlClient, bufferToHex } from '@hirosystems/api-toolkit';

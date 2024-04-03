@@ -3,13 +3,13 @@ import { FastifyPluginCallback, FastifyReply, FastifyRequest } from 'fastify';
 import { Server } from 'http';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import { ServerStatusResponse, ServerStatusResponseSchema } from '../schemas';
+import { handleChainTipCache } from '../controllers/cache';
 
 export const StatusRoutes: FastifyPluginCallback<
   Record<never, never>,
   Server,
   TypeBoxTypeProvider
 > = (fastify, options, done) => {
-  // const cacheHandler = getETagCacheHandler(db);
   const schema = {
     schema: {
       operationId: 'get_status',
@@ -51,11 +51,10 @@ export const StatusRoutes: FastifyPluginCallback<
     } catch (error) {
       logger.warn(error, `Unable to retrieve status chain tip`);
     }
-    // setETagCacheHeaders(res);
     await reply.send(response);
   };
 
-  fastify.addHook('preHandler', handleInscriptionTransfersCache);
+  fastify.addHook('preHandler', handleChainTipCache);
   fastify.get('/', schema, handler);
   fastify.post('/', schema, handler);
   done();

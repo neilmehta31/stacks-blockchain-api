@@ -33,7 +33,7 @@ import { createMicroblockRouter } from './routes/microblock';
 import { createStatusRouter } from './routes/status';
 import { createTokenRouter } from './routes/tokens';
 import { createFeeRateRouter } from './routes/fee-rate';
-import { setResponseNonCacheable } from './controllers/cache-controller';
+import { setResponseNonCacheable } from './controllers/express-cache-controller';
 
 import * as path from 'path';
 import * as fs from 'fs';
@@ -151,47 +151,47 @@ export async function startApiServer(opts: {
   // See https://expressjs.com/en/api.html#etag.options.table
   // app.set('etag', false);
 
-  app.get('/', (req, res) => {
-    res.redirect(`/extended/`);
-  });
+  // app.get('/', (req, res) => {
+  //   res.redirect(`/extended/`);
+  // });
 
-  app.use('/doc', (req, res) => {
-    // if env variable for API_DOCS_URL is given
-    if (apiDocumentationUrl) {
-      return res.redirect(apiDocumentationUrl);
-    } else if (!isProdEnv) {
-      // use local documentation if serving locally
-      const apiDocumentationPath = path.join(__dirname + '../../../docs/.tmp/index.html');
-      if (fs.existsSync(apiDocumentationPath)) {
-        return res.sendFile(apiDocumentationPath);
-      }
+  // app.use('/doc', (req, res) => {
+  //   // if env variable for API_DOCS_URL is given
+  //   if (apiDocumentationUrl) {
+  //     return res.redirect(apiDocumentationUrl);
+  //   } else if (!isProdEnv) {
+  //     // use local documentation if serving locally
+  //     const apiDocumentationPath = path.join(__dirname + '../../../docs/.tmp/index.html');
+  //     if (fs.existsSync(apiDocumentationPath)) {
+  //       return res.sendFile(apiDocumentationPath);
+  //     }
 
-      const docNotFound = {
-        error: 'Local documentation not found',
-        desc: 'Please run the command: `npm run build:docs` and restart your server',
-      };
-      return res.send(docNotFound).status(404);
-    }
-    // for production and no API_DOCS_URL provided
-    const errObj = {
-      error: 'Documentation is not available',
-      desc: `You can still read documentation from https://docs.hiro.so/api`,
-    };
-    res.send(errObj).status(404);
-  });
+  //     const docNotFound = {
+  //       error: 'Local documentation not found',
+  //       desc: 'Please run the command: `npm run build:docs` and restart your server',
+  //     };
+  //     return res.send(docNotFound).status(404);
+  //   }
+  //   // for production and no API_DOCS_URL provided
+  //   const errObj = {
+  //     error: 'Documentation is not available',
+  //     desc: `You can still read documentation from https://docs.hiro.so/api`,
+  //   };
+  //   res.send(errObj).status(404);
+  // });
 
   // Setup extended API routes
   app.use(
     '/extended',
     (() => {
       const router = express.Router();
-      router.use(cors());
+      // router.use(cors());
       router.use((req, res, next) => {
         // Set caching on all routes to be disabled by default, individual routes can override
         res.set('Cache-Control', 'no-store');
         next();
       });
-      router.use('/', createStatusRouter(datastore));
+      // router.use('/', createStatusRouter(datastore));
       router.use(
         '/v1',
         (() => {
@@ -264,19 +264,19 @@ export async function startApiServer(opts: {
     })()
   );
 
-  // Setup direct proxy to core-node RPC endpoints (/v2)
-  // pricing endpoint
-  app.use(
-    '/v2',
-    (() => {
-      const router = express.Router();
-      router.use(cors());
-      router.use('/prices', createBnsPriceRouter(datastore, chainId));
-      router.use('/', createCoreNodeRpcProxyRouter(datastore));
+  // // Setup direct proxy to core-node RPC endpoints (/v2)
+  // // pricing endpoint
+  // app.use(
+  //   '/v2',
+  //   (() => {
+  //     const router = express.Router();
+  //     router.use(cors());
+  //     router.use('/prices', createBnsPriceRouter(datastore, chainId));
+  //     router.use('/', createCoreNodeRpcProxyRouter(datastore));
 
-      return router;
-    })()
-  );
+  //     return router;
+  //   })()
+  // );
 
   // Rosetta API -- https://www.rosetta-api.org
   if (parseBoolean(process.env['STACKS_API_ENABLE_ROSETTA'] ?? '1'))
@@ -307,81 +307,81 @@ export async function startApiServer(opts: {
     })()
   );
 
-  //handle invalid request gracefully
-  app.use((req, res) => {
-    res.status(404).json({ message: `${req.method} ${req.path} not found` });
-  });
+  // //handle invalid request gracefully
+  // app.use((req, res) => {
+  //   res.status(404).json({ message: `${req.method} ${req.path} not found` });
+  // });
 
-  // Setup error handler (must be added at the end of the middleware stack)
-  app.use(((error, req, res, next) => {
-    if (req.method === 'GET' && res.statusCode !== 200 && res.hasHeader('ETag')) {
-      logger.error(
-        error,
-        `Non-200 request has ETag: ${res.header('ETag')}, Cache-Control: ${res.header(
-          'Cache-Control'
-        )}`
-      );
-    }
-    if (error && res.headersSent && res.statusCode !== 200 && res.hasHeader('ETag')) {
-      logger.error(
-        error,
-        `A non-200 response with an error in request processing has ETag: ${res.header(
-          'ETag'
-        )}, Cache-Control: ${res.header('Cache-Control')}`
-      );
-    }
-    if (!res.headersSent && (error || res.statusCode !== 200)) {
-      setResponseNonCacheable(res);
-    }
-    if (error && !res.headersSent) {
-      if (error instanceof InvalidRequestError) {
-        logger.warn(error, error.message);
-        res.status(error.status).json({ error: error.message }).end();
-      } else if (isPgConnectionError(error)) {
-        res.status(503).json({ error: `The database service is unavailable` }).end();
-      } else {
-        res.status(500);
-        const errorTag = uuid();
-        Object.assign(error, { errorTag: errorTag });
-        res
-          .json({ error: error.toString(), stack: (error as Error).stack, errorTag: errorTag })
-          .end();
-      }
-    }
-    next(error);
-  }) as express.ErrorRequestHandler);
+  // // Setup error handler (must be added at the end of the middleware stack)
+  // app.use(((error, req, res, next) => {
+  //   if (req.method === 'GET' && res.statusCode !== 200 && res.hasHeader('ETag')) {
+  //     logger.error(
+  //       error,
+  //       `Non-200 request has ETag: ${res.header('ETag')}, Cache-Control: ${res.header(
+  //         'Cache-Control'
+  //       )}`
+  //     );
+  //   }
+  //   if (error && res.headersSent && res.statusCode !== 200 && res.hasHeader('ETag')) {
+  //     logger.error(
+  //       error,
+  //       `A non-200 response with an error in request processing has ETag: ${res.header(
+  //         'ETag'
+  //       )}, Cache-Control: ${res.header('Cache-Control')}`
+  //     );
+  //   }
+  //   if (!res.headersSent && (error || res.statusCode !== 200)) {
+  //     setResponseNonCacheable(res);
+  //   }
+  //   if (error && !res.headersSent) {
+  //     if (error instanceof InvalidRequestError) {
+  //       logger.warn(error, error.message);
+  //       res.status(error.status).json({ error: error.message }).end();
+  //     } else if (isPgConnectionError(error)) {
+  //       res.status(503).json({ error: `The database service is unavailable` }).end();
+  //     } else {
+  //       res.status(500);
+  //       const errorTag = uuid();
+  //       Object.assign(error, { errorTag: errorTag });
+  //       res
+  //         .json({ error: error.toString(), stack: (error as Error).stack, errorTag: errorTag })
+  //         .end();
+  //     }
+  //   }
+  //   next(error);
+  // }) as express.ErrorRequestHandler);
 
-  // Store all the registered express routes for usage with metrics reporting
-  routes = expressListEndpoints(app).map(endpoint => ({
-    path: endpoint.path,
-    regexp: pathToRegex.pathToRegexp(endpoint.path),
-  }));
+  // // Store all the registered express routes for usage with metrics reporting
+  // routes = expressListEndpoints(app).map(endpoint => ({
+  //   path: endpoint.path,
+  //   regexp: pathToRegex.pathToRegexp(endpoint.path),
+  // }));
 
-  // Manual route definitions for the /v2/ proxied endpoints
-  routes.push({
-    path: '/v2/pox',
-    regexp: /^\/v2\/pox(.*)/,
-  });
-  routes.push({
-    path: '/v2/info',
-    regexp: /^\/v2\/info(.*)/,
-  });
-  routes.push({
-    path: '/v2/accounts/*',
-    regexp: /^\/v2\/accounts(.*)/,
-  });
-  routes.push({
-    path: '/v2/contracts/call-read/*',
-    regexp: /^\/v2\/contracts\/call-read(.*)/,
-  });
-  routes.push({
-    path: '/v2/map_entry/*',
-    regexp: /^\/v2\/map_entry(.*)/,
-  });
-  routes.push({
-    path: '/v2/*',
-    regexp: /^\/v2(.*)/,
-  });
+  // // Manual route definitions for the /v2/ proxied endpoints
+  // routes.push({
+  //   path: '/v2/pox',
+  //   regexp: /^\/v2\/pox(.*)/,
+  // });
+  // routes.push({
+  //   path: '/v2/info',
+  //   regexp: /^\/v2\/info(.*)/,
+  // });
+  // routes.push({
+  //   path: '/v2/accounts/*',
+  //   regexp: /^\/v2\/accounts(.*)/,
+  // });
+  // routes.push({
+  //   path: '/v2/contracts/call-read/*',
+  //   regexp: /^\/v2\/contracts\/call-read(.*)/,
+  // });
+  // routes.push({
+  //   path: '/v2/map_entry/*',
+  //   regexp: /^\/v2\/map_entry(.*)/,
+  // });
+  // routes.push({
+  //   path: '/v2/*',
+  //   regexp: /^\/v2(.*)/,
+  // });
 
   const server = createServer(app);
 

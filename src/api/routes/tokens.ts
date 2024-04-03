@@ -13,7 +13,7 @@ import { isValidPrincipal } from '../../helpers';
 import { booleanValueForParam, isUnanchoredRequest } from '../query-helpers';
 import { decodeClarityValueToRepr } from 'stacks-encoding-native-js';
 import { getAssetEventTypeString, parseDbTx } from '../controllers/db-controller';
-import { getETagCacheHandler, setETagCacheHeaders } from '../controllers/cache-controller';
+import { getETagCacheHandler, setETagCacheHeaders } from '../controllers/express-cache-controller';
 import { PgStore } from '../../datastore/pg-store';
 import { has0xPrefix } from '@hirosystems/api-toolkit';
 

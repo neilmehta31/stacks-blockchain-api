@@ -62,7 +62,7 @@ const schema = Type.Object({
   PG_PRIMARY_MAX_LIFETIME: Type.Optional(Type.Integer({ default: 60 })),
   PG_PRIMARY_CLOSE_TIMEOUT: Type.Optional(Type.Integer({ default: 5 })),
   PG_PRIMARY_CONNECTION_POOL_MAX: Type.Optional(Type.Integer({ default: 10 })),
-  PG_PRIMARY_CONNECTION_URI: Type.String(),
+  PG_PRIMARY_CONNECTION_URI: Type.Optional(Type.String()),
 
   /**
    * Insert concurrency when processing new blocks. If your PostgreSQL is operating on SSD and has
@@ -82,7 +82,7 @@ const schema = Type.Object({
    * If specified, an http server providing profiling capability endpoints will be opened on the
    * given port. This port should not be publicly exposed.
    */
-  STACKS_PROFILER_PORT: Type.Integer({ default: 9119 }),
+  STACKS_PROFILER_PORT: Type.Optional(Type.Integer({ default: 9119 })),
 
   STACKS_CORE_EVENT_HOST: Type.String({ default: '127.0.0.1' }),
   STACKS_CORE_EVENT_PORT: Type.Integer({ default: 3700, minimum: 0, maximum: 65535 }),
@@ -193,7 +193,7 @@ const schema = Type.Object({
    * documentation of openapi.yaml for test / development NODE_ENV. For production, /doc is not
    * served if this env var is not provided.
    */
-  API_DOCS_URL: Type.String({ default: 'https://docs.hiro.so/api' }),
+  API_DOCS_URL: Type.Optional(Type.String({ default: 'https://docs.hiro.so/api' })),
 
   /**
    * For use while syncing. Places the API into an "Initial Block Download(IBD)" mode, forcing it to

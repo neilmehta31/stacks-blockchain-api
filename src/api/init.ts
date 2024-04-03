@@ -1,4 +1,4 @@
-import Fastify, { FastifyPluginAsync, FastifyReply, FastifyRequest } from 'fastify';
+import Fastify, { FastifyPluginAsync } from 'fastify';
 import FastifyCors from '@fastify/cors';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
 import FastifyMetrics from 'fastify-metrics';
@@ -8,25 +8,31 @@ import { PgWriteStore } from '../datastore/pg-write-store';
 import { PINO_LOGGER_CONFIG, SERVER_VERSION, isProdEnv } from '@hirosystems/api-toolkit';
 import { Server } from 'http';
 import { StatusRoutes } from './routes/status';
+import { DocsRoutes } from './routes/docs';
 
-function addApiServerResponseHeader(request: FastifyRequest, reply: FastifyReply) {
-  return reply.header(
-    'X-API-Version',
-    `${SERVER_VERSION.tag} (${SERVER_VERSION.branch}:${SERVER_VERSION.commit})`
-  );
-}
+export const ApiV1: FastifyPluginAsync<
+  Record<never, never>,
+  Server,
+  TypeBoxTypeProvider
+> = async fastify => {
+  // await fastify.register(StatusRoutes);
+};
 
 export const Api: FastifyPluginAsync<
   Record<never, never>,
   Server,
   TypeBoxTypeProvider
 > = async fastify => {
-  fastify.addHook('onSend', addApiServerResponseHeader);
+  fastify.addHook('preHandler', async (request, reply) => {
+    void reply.header(
+      'X-API-Version',
+      `${SERVER_VERSION.tag} (${SERVER_VERSION.branch}:${SERVER_VERSION.commit})`
+    );
+  });
+
+  await fastify.register(DocsRoutes);
   await fastify.register(StatusRoutes);
-  // await fastify.register(InscriptionsRoutes);
-  // await fastify.register(SatRoutes);
-  // await fastify.register(StatsRoutes);
-  // await fastify.register(Brc20Routes);
+  await fastify.register(ApiV1, { prefix: '/v1' });
 };
 
 export async function buildApiServer(args: {
@@ -45,6 +51,10 @@ export async function buildApiServer(args: {
     await fastify.register(FastifyMetrics, { endpoint: null });
   }
   await fastify.register(FastifyCors, { exposedHeaders: ['X-API-Version'] });
+
+  fastify.get('/', async (request, reply) => {
+    await reply.redirect(301, '/extended');
+  });
   await fastify.register(Api, { prefix: '/extended' });
 
   return fastify;

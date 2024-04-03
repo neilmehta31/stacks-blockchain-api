@@ -10,7 +10,7 @@ import {
 } from '@stacks/stacks-blockchain-api-types';
 import { getBlockParams } from '../query-helpers';
 import { PgStore } from '../../datastore/pg-store';
-import { getETagCacheHandler, setETagCacheHeaders } from '../controllers/cache-controller';
+import { getETagCacheHandler, setETagCacheHeaders } from '../controllers/express-cache-controller';
 
 export function createStxSupplyRouter(db: PgStore): express.Router {
   const router = express.Router();

@@ -3,7 +3,7 @@ import {
   BurnBlockListResponse,
   NakamotoBlockListResponse,
 } from '@stacks/stacks-blockchain-api-types';
-import { getETagCacheHandler, setETagCacheHeaders } from '../../controllers/cache-controller';
+import { getETagCacheHandler, setETagCacheHeaders } from '../../controllers/express-cache-controller';
 import { asyncHandler } from '../../async-handler';
 import { PgStore } from '../../../datastore/pg-store';
 import { parseDbBurnBlock, parseDbNakamotoBlock } from './helpers';

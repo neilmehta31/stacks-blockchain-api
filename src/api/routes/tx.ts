@@ -31,7 +31,7 @@ import {
   ETagType,
   getETagCacheHandler,
   setETagCacheHeaders,
-} from '../controllers/cache-controller';
+} from '../controllers/express-cache-controller';
 import { PgStore } from '../../datastore/pg-store';
 import { has0xPrefix, isProdEnv } from '@hirosystems/api-toolkit';
 

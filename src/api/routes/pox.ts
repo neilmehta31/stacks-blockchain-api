@@ -9,7 +9,7 @@ import {
   validatePrincipal,
   validateRequestHexInput,
 } from '../query-helpers';
-import { getETagCacheHandler, setETagCacheHeaders } from '../controllers/cache-controller';
+import { getETagCacheHandler, setETagCacheHeaders } from '../controllers/express-cache-controller';
 import { PoolDelegationsResponse } from '@stacks/stacks-blockchain-api-types';
 
 export function createPoxEventsRouter(

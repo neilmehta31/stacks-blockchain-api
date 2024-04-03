@@ -1,6 +1,6 @@
 import * as express from 'express';
 import { PgStore } from '../../../datastore/pg-store';
-import { getETagCacheHandler, setETagCacheHeaders } from '../../controllers/cache-controller';
+import { getETagCacheHandler, setETagCacheHeaders } from '../../controllers/express-cache-controller';
 import { asyncHandler } from '../../async-handler';
 import {
   validRequestQuery,

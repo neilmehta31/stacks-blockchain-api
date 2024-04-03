@@ -9,7 +9,7 @@ import { ChainID } from '../../../helpers';
 import {
   getETagCacheHandler,
   setETagCacheHeaders,
-} from '../../controllers/cache-controller';
+} from '../../controllers/express-cache-controller';
 
 class NameRedirectError extends Error {
   constructor(message: string) {

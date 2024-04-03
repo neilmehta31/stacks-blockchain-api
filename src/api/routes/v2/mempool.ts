@@ -4,7 +4,7 @@ import {
   ETagType,
   getETagCacheHandler,
   setETagCacheHeaders,
-} from '../../controllers/cache-controller';
+} from '../../controllers/express-cache-controller';
 import { PgStore } from '../../../datastore/pg-store';
 import { DbMempoolFeePriority, DbTxTypeId } from '../../../datastore/common';
 import { MempoolFeePriorities } from '../../../../docs/generated';

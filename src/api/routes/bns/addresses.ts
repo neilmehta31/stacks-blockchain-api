@@ -6,7 +6,7 @@ import { ChainID } from '../../../helpers';
 import {
   getETagCacheHandler,
   setETagCacheHeaders,
-} from '../../controllers/cache-controller';
+} from '../../controllers/express-cache-controller';
 
 const SUPPORTED_BLOCKCHAINS = ['stacks'];
 

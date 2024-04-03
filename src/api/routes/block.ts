@@ -4,7 +4,7 @@ import { getBlockFromDataStore, getBlocksWithMetadata } from '../controllers/db-
 import { InvalidRequestError, InvalidRequestErrorType } from '../../errors';
 import { getPagingQueryLimit, parsePagingQueryInput, ResourceType } from '../pagination';
 import { getBlockHeightPathParam, validateRequestHexInput } from '../query-helpers';
-import { getETagCacheHandler, setETagCacheHeaders } from '../controllers/cache-controller';
+import { getETagCacheHandler, setETagCacheHeaders } from '../controllers/express-cache-controller';
 import { asyncHandler } from '../async-handler';
 import { PgStore } from '../../datastore/pg-store';
 import { has0xPrefix } from '@hirosystems/api-toolkit';
