@@ -229,7 +229,7 @@ export class WebSocketTransmitter {
         const addressTxs = dbTxsQuery.results;
         for (const addressTx of addressTxs) {
           const parsedTx = parseDbTx(addressTx.tx);
-          const result: AddressTransactionWithTransfers = {
+          const result = {
             tx: parsedTx,
             stx_sent: addressTx.stx_sent.toString(),
             stx_received: addressTx.stx_received.toString(),

@@ -1,6 +1,17 @@
 import { Nullable, Optional } from '@hirosystems/api-toolkit';
 import { Static, Type } from '@sinclair/typebox';
 import { PostConditionModeSchema, PostConditionSchema } from './post-conditions';
+import { MempoolTransactionSchema } from './mempool-transactions';
+
+export enum TransactionType {
+  coinbase = 'coinbase',
+  token_transfer = 'token_transfer',
+  smart_contract = 'smart_contract',
+  contract_call = 'contract_call',
+  poison_microblock = 'poison_microblock',
+  tenure_change = 'tenure_change',
+}
+export const TransactionTypeSchema = Type.Enum(TransactionType);
 
 export const BaseTransactionSchema = Type.Object(
   {
@@ -41,7 +52,7 @@ export const BaseTransactionSchema = Type.Object(
 );
 export type BaseTransaction = Static<typeof BaseTransactionSchema>;
 
-const AbstractTransactionSchema = Type.Composite([
+const AbstractTransactionSchema = Type.Intersect([
   BaseTransactionSchema,
   Type.Object({
     block_hash: Type.String({
@@ -167,7 +178,7 @@ export const TokenTransferTransactionMetadataSchema = Type.Object(
 export type TokenTransferTransactionMetadata = Static<
   typeof TokenTransferTransactionMetadataSchema
 >;
-export const TokenTransferTransactionSchema = Type.Composite([
+export const TokenTransferTransactionSchema = Type.Intersect([
   AbstractTransactionSchema,
   TokenTransferTransactionMetadataSchema,
 ]);
@@ -203,7 +214,7 @@ export const SmartContractTransactionMetadataSchema = Type.Object(
 export type SmartContractTransactionMetadata = Static<
   typeof SmartContractTransactionMetadataSchema
 >;
-export const SmartContractTransactionSchema = Type.Composite([
+export const SmartContractTransactionSchema = Type.Intersect([
   AbstractTransactionSchema,
   SmartContractTransactionMetadataSchema,
 ]);
@@ -248,7 +259,7 @@ export const ContractCallTransactionMetadataSchema = Type.Object(
   }
 );
 export type ContractCallTransactionMetadata = Static<typeof ContractCallTransactionMetadataSchema>;
-export const ContractCallTransactionSchema = Type.Composite([
+export const ContractCallTransactionSchema = Type.Intersect([
   AbstractTransactionSchema,
   ContractCallTransactionMetadataSchema,
 ]);
@@ -275,7 +286,7 @@ export const PoisonMicroblockTransactionMetadataSchema = Type.Object(
 export type PoisonMicroblockTransactionMetadata = Static<
   typeof PoisonMicroblockTransactionMetadataSchema
 >;
-export const PoisonMicroblockTransactionSchema = Type.Composite([
+export const PoisonMicroblockTransactionSchema = Type.Intersect([
   AbstractTransactionSchema,
   PoisonMicroblockTransactionMetadataSchema,
 ]);
@@ -313,7 +324,7 @@ export const CoinbaseTransactionMetadataSchema = Type.Object(
   }
 );
 export type CoinbaseTransactionMetadata = Static<typeof CoinbaseTransactionMetadataSchema>;
-export const CoinbaseTransactionSchema = Type.Composite([
+export const CoinbaseTransactionSchema = Type.Intersect([
   AbstractTransactionSchema,
   CoinbaseTransactionMetadataSchema,
 ]);
@@ -357,7 +368,7 @@ export const TenureChangeTransactionMetadataSchema = Type.Object(
   }
 );
 export type TenureChangeTransactionMetadata = Static<typeof TenureChangeTransactionMetadataSchema>;
-export const TenureChangeTransactionSchema = Type.Composite([
+export const TenureChangeTransactionSchema = Type.Intersect([
   AbstractTransactionSchema,
   TenureChangeTransactionMetadataSchema,
 ]);
@@ -382,3 +393,37 @@ export const TransactionSchema = Type.Union([
   TenureChangeTransactionSchema,
 ]);
 export type Transaction = Static<typeof TransactionSchema>;
+
+export const TransactionFoundSchema = Type.Object(
+  {
+    found: Type.Literal(true),
+    result: Type.Union([TransactionSchema, MempoolTransactionSchema]),
+  },
+  {
+    title: 'TransactionFound',
+    additionalProperties: false,
+    description: 'This object returns transaction for found true',
+  }
+);
+export type TransactionFound = Static<typeof TransactionFoundSchema>;
+
+export const TransactionNotFoundSchema = Type.Object(
+  {
+    found: Type.Literal(false),
+    result: Type.Object({
+      tx_id: Type.String(),
+    }),
+  },
+  {
+    title: 'TransactionNotFound',
+    additionalProperties: false,
+    description: 'This object returns the id for not found transaction',
+  }
+);
+export type TransactionNotFound = Static<typeof TransactionNotFoundSchema>;
+
+export const TransactionSearchResultSchema = Type.Union([
+  TransactionFoundSchema,
+  TransactionNotFoundSchema,
+]);
+export type TransactionSearchResult = Static<typeof TransactionSearchResultSchema>;

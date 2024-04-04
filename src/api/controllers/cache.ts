@@ -75,6 +75,14 @@ export async function handleChainTipCache(request: FastifyRequest, reply: Fastif
   return handleCache(ETagType.chainTip, request, reply);
 }
 
+export async function handleMempoolCache(request: FastifyRequest, reply: FastifyReply) {
+  return handleCache(ETagType.mempool, request, reply);
+}
+
+export async function handleTransactionCache(request: FastifyRequest, reply: FastifyReply) {
+  return handleCache(ETagType.transaction, request, reply);
+}
+
 async function handleCache(type: ETagType, request: FastifyRequest, reply: FastifyReply) {
   const metrics = getETagMetrics();
   const ifNoneMatch = parseIfNoneMatchHeader(request.headers['if-none-match']);

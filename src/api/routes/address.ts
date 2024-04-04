@@ -231,7 +231,7 @@ export function createAddressRouter(db: PgStore, chainId: ChainID): express.Rout
           atSingleBlock,
         });
         const results = txResults.map(dbTx => parseDbTx(dbTx));
-        const response: TransactionResults = { limit, offset, total, results };
+        const response = { limit, offset, total, results };
         return response;
       });
       setETagCacheHeaders(res);
@@ -263,7 +263,7 @@ export function createAddressRouter(db: PgStore, chainId: ChainID): express.Rout
           if (!txQuery.found) {
             throw new Error('unexpected tx not found -- fix tx enumeration query');
           }
-          const result: AddressTransactionWithTransfers = {
+          const result = {
             tx: txQuery.result,
             stx_sent: results.stx_sent.toString(),
             stx_received: results.stx_received.toString(),
@@ -332,7 +332,7 @@ export function createAddressRouter(db: PgStore, chainId: ChainID): express.Rout
           if (!txQuery.found) {
             throw new Error('unexpected tx not found -- fix tx enumeration query');
           }
-          const result: AddressTransactionWithTransfers = {
+          const result = {
             tx: txQuery.result,
             stx_sent: entry.stx_sent.toString(),
             stx_received: entry.stx_received.toString(),
@@ -364,7 +364,7 @@ export function createAddressRouter(db: PgStore, chainId: ChainID): express.Rout
           return result;
         });
 
-        const response: AddressTransactionsWithTransfersListResponse = {
+        const response = {
           limit,
           offset,
           total,
@@ -496,7 +496,7 @@ export function createAddressRouter(db: PgStore, chainId: ChainID): express.Rout
         includeUnanchored,
       });
       const results = txResults.map(tx => parseDbMempoolTx(tx));
-      const response: MempoolTransactionListResponse = { limit, offset, total, results };
+      const response = { limit, offset, total, results };
       if (!isProdEnv) {
         const schemaPath =
           '@stacks/stacks-blockchain-api-types/api/transaction/get-mempool-transactions.schema.json';

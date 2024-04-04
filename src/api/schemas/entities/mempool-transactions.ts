@@ -8,8 +8,9 @@ import {
   TenureChangeTransactionMetadataSchema,
   TokenTransferTransactionMetadataSchema,
 } from './transactions';
+import { Nullable } from '@hirosystems/api-toolkit';
 
-const AbstractMempoolTransactionSchema = Type.Composite([
+const AbstractMempoolTransactionSchema = Type.Intersect([
   BaseTransactionSchema,
   Type.Object(
     {
@@ -45,25 +46,25 @@ const AbstractMempoolTransactionSchema = Type.Composite([
 ]);
 export type AbstractMempoolTransaction = Static<typeof AbstractMempoolTransactionSchema>;
 
-export const TokenTransferMempoolTransactionSchema = Type.Composite([
+export const TokenTransferMempoolTransactionSchema = Type.Intersect([
   AbstractMempoolTransactionSchema,
   TokenTransferTransactionMetadataSchema,
 ]);
 export type TokenTransferMempoolTransaction = Static<typeof TokenTransferMempoolTransactionSchema>;
 
-export const SmartContractMempoolTransactionSchema = Type.Composite([
+export const SmartContractMempoolTransactionSchema = Type.Intersect([
   AbstractMempoolTransactionSchema,
   SmartContractTransactionMetadataSchema,
 ]);
 export type SmartContractMempoolTransaction = Static<typeof SmartContractMempoolTransactionSchema>;
 
-export const ContractCallMempoolTransactionSchema = Type.Composite([
+export const ContractCallMempoolTransactionSchema = Type.Intersect([
   AbstractMempoolTransactionSchema,
   ContractCallTransactionMetadataSchema,
 ]);
 export type ContractCallMempoolTransaction = Static<typeof ContractCallMempoolTransactionSchema>;
 
-export const PoisonMicroblockMempoolTransactionSchema = Type.Composite([
+export const PoisonMicroblockMempoolTransactionSchema = Type.Intersect([
   AbstractMempoolTransactionSchema,
   PoisonMicroblockTransactionMetadataSchema,
 ]);
@@ -71,13 +72,13 @@ export type PoisonMicroblockMempoolTransaction = Static<
   typeof PoisonMicroblockMempoolTransactionSchema
 >;
 
-export const CoinbaseMempoolTransactionSchema = Type.Composite([
+export const CoinbaseMempoolTransactionSchema = Type.Intersect([
   AbstractMempoolTransactionSchema,
   CoinbaseTransactionMetadataSchema,
 ]);
 export type CoinbaseMempoolTransaction = Static<typeof CoinbaseMempoolTransactionSchema>;
 
-export const TenureChangeMempoolTransactionSchema = Type.Composite([
+export const TenureChangeMempoolTransactionSchema = Type.Intersect([
   AbstractMempoolTransactionSchema,
   TenureChangeTransactionMetadataSchema,
 ]);
@@ -92,3 +93,13 @@ export const MempoolTransactionSchema = Type.Union([
   TenureChangeMempoolTransactionSchema,
 ]);
 export type MempoolTransaction = Static<typeof MempoolTransactionSchema>;
+
+export const MempoolStatsSchema = Type.Object(
+  {
+    p25: Nullable(Type.Number()),
+    p50: Nullable(Type.Number()),
+    p75: Nullable(Type.Number()),
+    p95: Nullable(Type.Number()),
+  },
+  { additionalProperties: true }
+);

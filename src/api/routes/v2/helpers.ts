@@ -7,6 +7,7 @@ import {
   PoxSigner,
   PoxStacker,
   SmartContractsStatusResponse,
+  Transaction,
 } from 'docs/generated';
 import {
   DbAddressTransactionEvent,
@@ -90,7 +91,7 @@ export function parseDbTxWithAccountTransferSummary(
   tx: DbTxWithAddressTransfers
 ): AddressTransaction {
   return {
-    tx: parseDbTx(tx),
+    tx: parseDbTx(tx) as unknown as Transaction,
     stx_sent: tx.stx_sent.toString(),
     stx_received: tx.stx_received.toString(),
     events: {

@@ -19,7 +19,7 @@ export const ApiV1: FastifyPluginAsync<
   fastify.get('/status', async (_, reply) => {
     await reply.redirect(301, '/extended');
   });
-  await fastify.register(V1TxRoutes);
+  await fastify.register(V1TxRoutes, { prefix: '/tx' });
 };
 
 export const Api: FastifyPluginAsync<

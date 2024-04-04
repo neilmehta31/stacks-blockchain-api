@@ -25,9 +25,6 @@ import {
   TransactionEventSmartContractLog,
   TransactionEventStxAsset,
   TransactionEventStxLock,
-  TransactionFound,
-  TransactionList,
-  TransactionNotFound,
   TransactionStatus,
   TransactionType,
 } from '@stacks/stacks-blockchain-api-types';
@@ -65,12 +62,16 @@ import {
   TenureChangeTransactionMetadata,
   TokenTransferTransactionMetadata,
   Transaction,
+  TransactionFound,
   TransactionMetadata,
+  TransactionNotFound,
+  TransactionSearchResult,
 } from '../schemas/entities/transactions';
 import {
   AbstractMempoolTransaction,
   MempoolTransaction,
 } from '../schemas/entities/mempool-transactions';
+import { TransactionSearchResponse } from '../schemas/responses';
 
 export function parseTxTypeStrings(values: string[]): TransactionType[] {
   return values.map(v => {
@@ -1250,7 +1251,7 @@ export async function getTxFromDataStore(
 export async function searchTxs(
   db: PgStore,
   args: GetTxsArgs | GetTxsWithEventsArgs
-): Promise<TransactionList> {
+): Promise<TransactionSearchResponse> {
   return await db.sqlTransaction(async sql => {
     const minedTxs = await getTxsFromDataStore(db, args);
 
@@ -1295,7 +1296,7 @@ export async function searchTxs(
 
     // generating response
     const resp = [...foundTransactions, ...notFoundTransactions].reduce(
-      (map: TransactionList, obj) => {
+      (map: TransactionSearchResponse, obj) => {
         if (obj.result) {
           map[obj.result.tx_id] = obj;
         }

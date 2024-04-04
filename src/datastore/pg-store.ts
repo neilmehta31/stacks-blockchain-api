@@ -102,7 +102,7 @@ import {
 } from './connection';
 import * as path from 'path';
 import { PgStoreV2 } from './pg-store-v2';
-import { MempoolOrderByParam, OrderParam } from '../api/query-helpers';
+import { MempoolOrderBy, Order } from 'src/api/schemas/params';
 
 export const MIGRATIONS_DIR = path.join(REPO_DIR, 'migrations');
 
@@ -1303,8 +1303,8 @@ export class PgStore extends BasePgStore {
     limit: number;
     offset: number;
     includeUnanchored: boolean;
-    orderBy?: MempoolOrderByParam;
-    order?: OrderParam;
+    orderBy?: MempoolOrderBy;
+    order?: Order;
     senderAddress?: string;
     recipientAddress?: string;
     address?: string;
